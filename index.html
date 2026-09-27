@@ -2,13 +2,211 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="robots" content="noindex,nofollow" />
-  <meta http-equiv="refresh" content="0;url=https://bluepedallounge.com/waiver" />
-  <title>Redirecting…</title>
-  <link rel="canonical" href="https://bluepedallounge.com/waiver" />
+  <title>Quick Waiver | Blue Shore Pedal Lounge</title>
+  <style>
+    :root { --bg:#0b1220; --card:#121a2b; --fg:#f5f7fb; --muted:#a8b3c7; --accent:#3dd6c6; --danger:#ff6b6b; --ok:#22c55e; }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:var(--bg); color:var(--fg); min-height:100vh; }
+    main { max-width:28rem; margin:0 auto; padding:1.5rem 1.25rem 5rem; }
+    img.logo { display:block; width:5.5rem; height:5.5rem; border-radius:999px; margin:0 auto 1rem; object-fit:cover; }
+    h1 { text-align:center; font-size:1.75rem; letter-spacing:.04em; text-transform:uppercase; margin:0 0 1rem; }
+    p.copy { color:var(--muted); line-height:1.55; font-size:.95rem; margin:0 0 1.25rem; }
+    label { display:block; font-size:.75rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin:0 0 .4rem; }
+    input[type=text], input[type=tel] { width:100%; padding:.85rem .9rem; border-radius:.6rem; border:1px solid #2a3650; background:#0e1626; color:var(--fg); font-size:1rem; margin-bottom:1rem; }
+    .row { display:flex; gap:.65rem; align-items:flex-start; margin:0 0 1rem; }
+    .row input { width:auto; margin:.2rem .4rem 0 0; }
+    .row label { text-transform:none; letter-spacing:0; font-weight:500; font-size:.9rem; color:var(--muted); }
+    button { width:100%; border:0; border-radius:.7rem; padding:.95rem 1rem; font-weight:700; font-size:1rem; cursor:pointer; background:var(--accent); color:#04211e; }
+    button:disabled { opacity:.45; cursor:not-allowed; }
+    button.secondary { background:transparent; color:var(--fg); border:1px solid #2a3650; margin-top:.6rem; }
+    .err { color:var(--danger); font-size:.9rem; margin:.5rem 0 0; min-height:1.2em; }
+    .hint { color:var(--muted); font-size:.85rem; margin:0 0 1rem; }
+    .success { text-align:center; padding:2rem 0; }
+    .success img { width:9rem; height:9rem; object-fit:contain; margin:0 auto 1rem; display:block; }
+    .success h2 { margin:0 0 .5rem; font-size:1.6rem; }
+    .foot { color:var(--muted); font-size:.8rem; margin-top:1.25rem; }
+    a { color:var(--accent); }
+    .float-call { position:fixed; right:1rem; bottom:1rem; background:#163a36; color:var(--fg); padding:.7rem 1rem; border-radius:999px; text-decoration:none; font-weight:600; box-shadow:0 8px 24px rgba(0,0,0,.35); }
+    .hidden { display:none; }
+  </style>
 </head>
 <body>
-  <p>This temporary page was cancelled. <a href="https://bluepedallounge.com/waiver">Continue to the Quick Waiver</a>.</p>
-  <script>location.replace("https://bluepedallounge.com/waiver");</script>
+  <main>
+    <img class="logo" src="https://vibe.filesafe.space/1783714483366437915/attachments/2edc7451-3df5-4191-be38-125e33f66b74.jpg" alt="Blue Shore Pedal Lounge" />
+
+    <section id="step-form">
+      <h1>Quick Waiver</h1>
+      <p class="copy">I acknowledge the risks of riding a pedal trolley, including falls, traffic, and injury, and I agree to follow staff instructions. Alcohol may be present on this ride; I ride at my own risk if I drink or ride with others who drink, and I will not board if I am too impaired to ride safely. I release Blue Shore Pedal Lounge LLC from ordinary negligence claims to the fullest extent Texas law allows, and I confirm I have read and agree to the full Terms and Waiver at <a href="https://bluepedallounge.com/terms" target="_blank" rel="noopener noreferrer">bluepedallounge.com/terms</a>.</p>
+      <form id="waiver-form">
+        <label for="name">Full name</label>
+        <input id="name" name="name" type="text" autocomplete="name" placeholder="Your full name" required />
+        <label for="phone">Mobile number</label>
+        <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="(361) 555-0199" required />
+        <div class="row">
+          <input id="agree" type="checkbox" required />
+          <label for="agree">I agree to the above and to the full <a href="https://bluepedallounge.com/terms" target="_blank" rel="noopener noreferrer">Terms and Waiver</a>.</label>
+        </div>
+        <button id="submit-btn" type="submit" disabled>Submit</button>
+        <p class="err" id="form-err"></p>
+      </form>
+      <p class="foot">For walk-up and SMS riders. Booked guests may still be asked to complete the full waiver when required. Per ride — not a year-long pass.</p>
+    </section>
+
+    <section id="step-otp" class="hidden">
+      <h1>Enter code</h1>
+      <p class="hint" id="otp-hint"></p>
+      <form id="otp-form">
+        <label for="otp">Verification code</label>
+        <input id="otp" type="tel" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code" required />
+        <button id="verify-btn" type="submit">Verify &amp; Submit</button>
+        <button class="secondary" id="resend-btn" type="button">Resend code</button>
+        <button class="secondary" id="back-btn" type="button">Back</button>
+        <p class="err" id="otp-err"></p>
+      </form>
+    </section>
+
+    <section id="step-success" class="hidden success">
+      <img src="./beer-man.png" alt="Blue Shore Pedal Lounge beer man mascot" onerror="this.src='https://vibe.filesafe.space/1783714483366437915/attachments/2edc7451-3df5-4191-be38-125e33f66b74.jpg'" />
+      <h2>Waiver Acknowledged</h2>
+      <p class="hint">You’re set — show staff this screen if asked.</p>
+    </section>
+  </main>
+  <a class="float-call" href="tel:361-600-8508">361-600-8508</a>
+
+  <script>
+    const OTP_SEND_URL = "https://bspl-waiver-otp.onrender.com/send";
+    const OTP_CHECK_URL = "https://bspl-waiver-otp.onrender.com/check";
+
+    const formStep = document.getElementById("step-form");
+    const otpStep = document.getElementById("step-otp");
+    const successStep = document.getElementById("step-success");
+    const nameEl = document.getElementById("name");
+    const phoneEl = document.getElementById("phone");
+    const agreeEl = document.getElementById("agree");
+    const submitBtn = document.getElementById("submit-btn");
+    const formErr = document.getElementById("form-err");
+    const otpErr = document.getElementById("otp-err");
+    const otpHint = document.getElementById("otp-hint");
+    const otpEl = document.getElementById("otp");
+
+    function show(step) {
+      formStep.classList.toggle("hidden", step !== "form");
+      otpStep.classList.toggle("hidden", step !== "otp");
+      successStep.classList.toggle("hidden", step !== "success");
+    }
+
+    function digitsOnly(s) { return String(s || "").replace(/\D/g, ""); }
+
+    function toE164(phone) {
+      const d = digitsOnly(phone);
+      if (d.length === 10) return "+1" + d;
+      if (d.length === 11 && d.startsWith("1")) return "+" + d;
+      if (String(phone).trim().startsWith("+") && d.length >= 10) return "+" + d;
+      return null;
+    }
+
+    function validUsPhone(phone) {
+      const e164 = toE164(phone);
+      if (!e164) return false;
+      const n = e164.slice(2);
+      return /^[2-9]\d{2}[2-9]\d{6}$/.test(n);
+    }
+
+    function syncSubmit() {
+      submitBtn.disabled = !(nameEl.value.trim() && validUsPhone(phoneEl.value) && agreeEl.checked);
+    }
+    nameEl.addEventListener("input", syncSubmit);
+    phoneEl.addEventListener("input", syncSubmit);
+    agreeEl.addEventListener("change", syncSubmit);
+
+    // Prefill only complete 10-digit phone query
+    (function prefill() {
+      const p = new URLSearchParams(location.search).get("phone") || "";
+      const d = digitsOnly(p);
+      if (d.length === 10 || (d.length === 11 && d.startsWith("1"))) {
+        const ten = d.length === 11 ? d.slice(1) : d;
+        phoneEl.value = `(${ten.slice(0,3)}) ${ten.slice(3,6)}-${ten.slice(6)}`;
+      }
+      syncSubmit();
+    })();
+
+    async function sendOtp() {
+      formErr.textContent = "";
+      otpErr.textContent = "";
+      const phone = toE164(phoneEl.value);
+      const res = await fetch(OTP_SEND_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ phone }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.status !== "sent") {
+        throw new Error(data.message || "Could not send the code.");
+      }
+      otpHint.textContent = `We sent a 6-digit code by text to ${phone}. Enter it below to finish your waiver. The code expires in 5 minutes.`;
+      show("otp");
+    }
+
+    document.getElementById("waiver-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (submitBtn.disabled) return;
+      submitBtn.disabled = true;
+      try {
+        await sendOtp();
+      } catch (err) {
+        formErr.textContent = err.message || "Could not send the code.";
+        syncSubmit();
+      }
+    });
+
+    document.getElementById("resend-btn").addEventListener("click", async () => {
+      otpErr.textContent = "";
+      try { await sendOtp(); } catch (err) { otpErr.textContent = err.message || "Resend failed."; }
+    });
+
+    document.getElementById("back-btn").addEventListener("click", () => {
+      otpEl.value = "";
+      otpErr.textContent = "";
+      show("form");
+      syncSubmit();
+    });
+
+    document.getElementById("otp-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      otpErr.textContent = "";
+      const code = otpEl.value.trim();
+      if (!/^\d{6}$/.test(code)) {
+        otpErr.textContent = "Enter the 6-digit code.";
+        return;
+      }
+      const phone = toE164(phoneEl.value);
+      const fullName = nameEl.value.trim();
+      const verifyBtn = document.getElementById("verify-btn");
+      verifyBtn.disabled = true;
+      try {
+        const res = await fetch(OTP_CHECK_URL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, code, fullName }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (data.status === "approved") {
+          show("success");
+          return;
+        }
+        if (data.status === "pending") {
+          otpErr.textContent = "That code didn’t match. Try again.";
+        } else {
+          otpErr.textContent = data.message || "Could not verify the code.";
+        }
+      } catch (_) {
+        otpErr.textContent = "Network error. Try again.";
+      } finally {
+        verifyBtn.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>
