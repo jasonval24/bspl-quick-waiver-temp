@@ -70,7 +70,7 @@
     <section id="step-success" class="hidden success">
       <img src="./beer-man.png" alt="Blue Shore Pedal Lounge beer man mascot" onerror="this.src='https://vibe.filesafe.space/1783714483366437915/attachments/2edc7451-3df5-4191-be38-125e33f66b74.jpg'" />
       <h2>Waiver Acknowledged</h2>
-      <p class="hint">You’re set — show staff this screen if asked.</p>
+      <p class="hint">Waiver acknowledged. Continuing…</p>
     </section>
   </main>
   <a class="float-call" href="tel:361-600-8508">361-600-8508</a>
@@ -78,6 +78,8 @@
   <script>
     const OTP_SEND_URL = "https://bspl-waiver-otp.onrender.com/send";
     const OTP_CHECK_URL = "https://bspl-waiver-otp.onrender.com/check";
+    const BOOKER_ORIGIN = "https://book.bluepedallounge.com";
+    const BOOKER_CONTINUE_URL = BOOKER_ORIGIN + "/waiver/continue";
 
     const formStep = document.getElementById("step-form");
     const otpStep = document.getElementById("step-otp");
@@ -112,6 +114,33 @@
       if (!e164) return false;
       const n = e164.slice(2);
       return /^[2-9]\d{2}[2-9]\d{6}$/.test(n);
+    }
+
+    function isBookerPayLink(value) {
+      const raw = String(value || "").trim();
+      if (!raw || raw.startsWith("//")) return false;
+      try {
+        const url = raw.startsWith("/") ? new URL(raw, BOOKER_ORIGIN) : new URL(raw);
+        if (url.origin !== BOOKER_ORIGIN) return false;
+        return url.pathname === "/pay" || url.pathname.startsWith("/pay/");
+      } catch (_) {
+        return false;
+      }
+    }
+
+    function waiverContinueUrl() {
+      const incoming = new URLSearchParams(location.search);
+      const out = new URLSearchParams();
+      ["experience", "service", "exp"].forEach((key) => {
+        const value = (incoming.get(key) || "").trim();
+        if (value) out.set(key, value);
+      });
+      ["returnUrl", "next", "pay"].forEach((key) => {
+        const value = (incoming.get(key) || "").trim();
+        if (value && isBookerPayLink(value)) out.set(key, value);
+      });
+      const qs = out.toString();
+      return qs ? BOOKER_CONTINUE_URL + "?" + qs : BOOKER_CONTINUE_URL;
     }
 
     function syncSubmit() {
@@ -185,6 +214,7 @@
       const fullName = nameEl.value.trim();
       const verifyBtn = document.getElementById("verify-btn");
       verifyBtn.disabled = true;
+      let leaveForPayment = false;
       try {
         const res = await fetch(OTP_CHECK_URL, {
           method: "POST",
@@ -193,7 +223,9 @@
         });
         const data = await res.json().catch(() => ({}));
         if (data.status === "approved") {
+          leaveForPayment = true;
           show("success");
+          location.replace(waiverContinueUrl());
           return;
         }
         if (data.status === "pending") {
@@ -204,7 +236,7 @@
       } catch (_) {
         otpErr.textContent = "Network error. Try again.";
       } finally {
-        verifyBtn.disabled = false;
+        if (!leaveForPayment) verifyBtn.disabled = false;
       }
     });
   </script>
